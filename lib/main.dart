@@ -59,9 +59,12 @@ class _MyAppState extends State<MyApp> {
                                     fontSize: 22, fontWeight: FontWeight.bold),
                               ),
                             ),
-                            Text(
-                              "To be completed by ${activities[index].date.day}/${activities[index].date.month}/${activities[index].date.year}",
-                              style: const TextStyle(color: Colors.grey),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 100),
+                              child: Text(
+                                "To be completed by ${activities[index].date.hour}:${activities[index].date.minute} on ${activities[index].date.day}/${activities[index].date.month}/${activities[index].date.year}",
+                                style: const TextStyle(color: Colors.grey),
+                              ),
                             ),
                           ]),
                       Align(
@@ -148,6 +151,12 @@ class _MyAppState extends State<MyApp> {
       setState(() {
         activities.add(result);
       });
+      var snackBar = const SnackBar(
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 1),
+        content: Text('Successfully added new task'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
 }
