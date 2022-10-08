@@ -165,7 +165,6 @@ class Activity {
   String name;
   DateTime date;
   bool notif;
-
   Activity(this.name, this.date, this.notif);
 }
 
@@ -181,6 +180,8 @@ class _AddTask extends State<AddTask> {
   String taskname = "";
   late DateTime date;
   bool notif = false;
+  bool datepick = false;
+  late DateTime reminddate;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -195,15 +196,19 @@ class _AddTask extends State<AddTask> {
             const SizedBox(height: 16),
             buildDate(),
             const SizedBox(height: 16),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                buildCheckbox(),
-                const Padding(
-                    padding: EdgeInsets.only(top: 5),
-                    child: (Text("Set Notification")))
-              ],
-            ),
+            datepick
+                ? Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      buildCheckbox(),
+                      const Padding(
+                          padding: EdgeInsets.only(top: 5),
+                          child: (Text("Set Notification")))
+                    ],
+                  )
+                : Container(),
+            notif ? const SizedBox(height: 16) : Container(),
+            notif ? buildDateforReminder() : Container(),
             const SizedBox(height: 16),
             buildSubmit(),
           ])),
@@ -234,15 +239,13 @@ class _AddTask extends State<AddTask> {
           suffixIcon: Icon(Icons.event_note),
           labelText: 'Pick date and time',
         ),
+        firstDate: DateTime(
+            DateTime.now().year, DateTime.now().month, DateTime.now().day),
         mode: DateTimeFieldPickerMode.dateAndTime,
-        autovalidateMode: AutovalidateMode.always,
-        validator: (value) {
-          DateTime? now = value ?? DateTime.now();
-          var d1 = DateTime.utc(now.year, now.month, now.day);
-          var d2 = DateTime.utc(
-              DateTime.now().year, DateTime.now().month, DateTime.now().day);
-          if (d1.isBefore(d2)) {
-            return 'Invalid Date';
+        autovalidateMode: AutovalidateMode.disabled,
+        validator: (e) {
+          if (e == null) {
+            return 'Cannot be empty';
           } else {
             return null;
           }
@@ -250,7 +253,25 @@ class _AddTask extends State<AddTask> {
         onDateSelected: (DateTime value) {
           setState(() {
             date = value;
+            datepick = !datepick;
           });
+        },
+      );
+  Widget buildDateforReminder() => DateTimeFormField(
+        decoration: const InputDecoration(
+          hintStyle: TextStyle(color: Colors.black45),
+          errorStyle: TextStyle(color: Colors.redAccent),
+          border: OutlineInputBorder(),
+          suffixIcon: Icon(Icons.event_note),
+          labelText: 'Pick date and time to be reminded',
+        ),
+        firstDate: DateTime.now(),
+        lastDate: date,
+        mode: DateTimeFieldPickerMode.dateAndTime,
+        autovalidateMode: AutovalidateMode.disabled,
+        validator: (value) {
+          if (value == null) return 'Cannot be empty';
+          return null;
         },
       );
 
